@@ -1,5 +1,5 @@
 /**
- * Items.kt
+ * Item.kt
  *
  * Arquivo que define a estrutura modular de itens e efeitos para o protótipo de combate.
  *
@@ -23,6 +23,9 @@
 
 package com.lucasalfare.flbattle
 
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+
 /**
  * Representa um item do jogo.
  *
@@ -35,6 +38,8 @@ class Item(
   val description: String,
   val effects: List<Effect>
 ) {
+  private val logger: Logger = LoggerFactory.getLogger(Item::class.java)
+
   /**
    * Aplica todos os efeitos do item ao Fighter alvo.
    *
@@ -43,7 +48,7 @@ class Item(
    * @param target Fighter que receberá os efeitos do item
    */
   fun use(target: Fighter) {
-    println("${target.name} usou o item $name")
+    logger.info("${target.name} usou o item $name")
     effects.forEach { it.apply(target) }
   }
 }

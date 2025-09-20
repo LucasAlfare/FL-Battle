@@ -17,24 +17,3 @@ interface Validator {
    */
   fun validate(attacker: Fighter, defender: Fighter, damage: Int): Boolean
 }
-
-/**
- * Função auxiliar para aplicar dano com validação.
- *
- * @param attacker Fighter que realiza o ataque
- * @param defender Fighter que recebe o ataque
- * @param damage Valor de dano calculado previamente
- * @param validators Lista de validadores ativos neste combate ou turno
- */
-fun applyDamageWithValidation(
-  attacker: Fighter,
-  defender: Fighter,
-  damage: Int,
-  validators: List<Validator>
-) {
-  if (validators.all { it.validate(attacker, defender, damage) }) {
-    defender.receiveDamage(damage, attacker)
-  } else {
-    println("Ação bloqueada por validação (ataque de ${attacker.name} a ${defender.name})")
-  }
-}

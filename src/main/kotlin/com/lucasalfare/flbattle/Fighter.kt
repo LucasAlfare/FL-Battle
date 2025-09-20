@@ -1,5 +1,8 @@
 package com.lucasalfare.flbattle
 
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+
 /**
  * Representa um personagem do jogo (player ou inimigo), agora com inventário e capacidade de usar itens.
  *
@@ -18,6 +21,9 @@ class Fighter(
   val attributes: Attributes,
   val rules: List<Rule>
 ) {
+
+  private val logger: Logger = LoggerFactory.getLogger(Fighter::class.java)
+
   /** HP atual do personagem */
   var hp = attributes.get("hp")
 
@@ -45,7 +51,28 @@ class Fighter(
    */
   fun receiveDamage(amount: Int, attacker: Fighter) {
     hp -= amount
-    println("$name took $amount damage from ${attacker.name} (HP: $hp)")
+    logger.info("$name took $amount damage from ${attacker.name} (HP: $hp)")
+  }
+
+  /**
+   * Função auxiliar para aplicar dano com validação.
+   *
+   * @param attacker Fighter que realiza o ataque
+   * @param defender Fighter que recebe o ataque
+   * @param damage Valor de dano calculado previamente
+   * @param validators Lista de validadores ativos neste combate ou turno
+   */
+  fun applyDamageWithValidation(
+    attacker: Fighter,
+    defender: Fighter,
+    damage: Int,
+    validators: List<Validator>
+  ) {
+    if (validators.all { it.validate(attacker, defender, damage) }) {
+      defender.receiveDamage(damage, attacker)
+    } else {
+      logger.warn("Ação bloqueada por validação (ataque de ${attacker.name} a ${defender.name})")
+    }
   }
 
   /** Retorna true se o personagem ainda estiver vivo */
@@ -59,7 +86,7 @@ class Fighter(
    */
   fun useItem(item: Item, target: Fighter) {
     if (!inventory.getItems().contains(item)) {
-      println("${name} não possui o item '${item.name}' no inventário")
+      logger.info("$name não possui o item '${item.name}' no inventário")
       return
     }
     item.use(target)
