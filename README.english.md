@@ -2,56 +2,56 @@
 
 ## Overview
 
-I am developing this prototype as a base for a combat system inspired by medieval MMORPGs like Final Fantasy, RuneScape, World of Warcraft, League of Legends. Currently, my ideas include:
+This prototype serves as a base for a combat system inspired by medieval MMORPGs such as Final Fantasy, RuneScape, World of Warcraft, and MOBA-style games like League of Legends. Current features include:
 
-* **Alternating turns** (turn-based)
+* **Turn-based combat**
 * **Characters with modular attributes**
 * **Flexible attack rules**
 * **Items with passive and active effects**
-* ***Validators* for consistency and complex interactions**
+* **Validators for consistency and complex interactions**
 
-The goal is to create the most possible **highly *modular* architecture**, scalable and extensible, allowing testing, rapid prototyping, and easy integration of new features. This gives me a framework to experiment with any game idea I may want to implement for myself. Even if I don’t make full-scale games like the examples above, I can implement card games, text-based combat games, etc.
+The goal is to create a **highly modular, scalable, and extensible architecture**, allowing testing, rapid prototyping, and easy integration of new features. This provides a foundation for experimenting with any gameplay ideas, including card games, text-based combat games, or other custom systems.
 
-The challenge of this modular architecture is finding the trade-off/limit/balance between simplicity and abstraction. Over-abstraction is never good, but for acceptable modularization, the current draft is likely *"ok"*.
+The main challenge is balancing simplicity with abstraction. Excessive abstraction can hinder usability, but the current draft strikes a functional modular balance.
 
-Much of the initial development leveraged *LLMs* to complete code based on my instructions, so it is still a rough prototype. As I update the code manually, it will evolve beyond the prototype stage.
+LLMs were partially used to generate code snippets, so the project remains a raw prototype. Updates will progressively refine it into a more polished system.
 
 ---
 
-## More on Motivation
+## Motivation
 
-* Create a flexible combat system without hardcoded values.
-* Enable creation of unique and varied characters with custom attributes and skills.
+* Build a flexible combat system without hardcoded values.
+* Support creation of unique characters with custom attributes and abilities.
 * Ensure modularity for items, buffs, and debuffs.
-* Implement a validation layer for complex interactions and to prevent inconsistencies.
-* Serve as a foundation for future expansion: PvP, PvE, group battles, special abilities, and strategic items.
+* Implement validation layers to handle complex interactions and prevent inconsistencies.
+* Serve as a foundation for future expansions: PvP, PvE, group battles, special abilities, and strategic items.
 
 ---
 
 ## Prototype Components
 
-Below are details of each component implemented in code, with **practical usage examples and implementation flow**.
+Below are the core components with **usage examples and implementation flow**.
 
 ---
 
 ### 1. **[Attributes](src/main/kotlin/com/lucasalfare/flbattle/Attributes.kt)**
 
-* **Purpose:** Store and manage character attributes in a modular way.
-* **Practical use:**
+* **Purpose:** Store and manage character attributes modularly.
+* **Usage:**
 
-    * Determine health points, strength, defense, magic resistance, agility, etc.
-    * Serve as a base for damage calculations and item effects.
-    * Allow dynamic modification: buffs, debuffs, equipped items, temporary effects.
+    * Define HP, strength, defense, magic resistance, agility, etc.
+    * Serve as a base for damage and item effect calculations.
+    * Support dynamic updates: buffs, debuffs, equipped items, temporary effects.
 * **Implementation flow:**
 
-    1. Create an `Attributes` instance when creating a `Fighter`.
+    1. Instantiate `Attributes` when creating a Fighter.
     2. Add key/value pairs for initial attributes.
-    3. Whenever an attack, item effect, or buff is applied, access and modify these values dynamically.
+    3. Access and modify values dynamically during attacks, item effects, or buffs.
 * **Example:**
 
   ```kotlin
   val warriorAttributes = Attributes(mutableMapOf("hp" to 100, "strength" to 15, "defense" to 10))
-  warriorAttributes.add("strength", 5) // item or skill buff
+  warriorAttributes.add("strength", 5) // item or ability buff
   val currentHp = warriorAttributes.get("hp")
   ```
 
@@ -59,16 +59,16 @@ Below are details of each component implemented in code, with **practical usage 
 
 ### 2. **[Rule](src/main/kotlin/com/lucasalfare/flbattle/Rules.kt)**
 
-* **Purpose:** Modularize damage and skill calculation logic.
-* **Practical use:**
+* **Purpose:** Modularize damage and ability logic.
+* **Usage:**
 
-    * Each `Fighter` can have multiple attack rules (physical, magical, critical, special).
-    * Allows changing calculation logic without modifying `Fighter` or `Battle`.
+    * Each Fighter can have multiple attack rules (physical, magical, critical, special).
+    * Change calculation logic without modifying Fighter or Battle classes.
 * **Implementation flow:**
 
-    1. Implement the `Rule` interface for each attack type.
-    2. Use attributes in the `calculate(attacker, defender)` method to define damage or effect.
-    3. Return the final value to apply to the target, possibly passing through validators.
+    1. Implement `Rule` interface for each attack type.
+    2. Define `calculate(attacker, defender)` using attributes.
+    3. Return final value, optionally processed by validators.
 * **Example:**
 
   ```kotlin
@@ -85,64 +85,99 @@ Below are details of each component implemented in code, with **practical usage 
 
 ### 3. **[Fighter](src/main/kotlin/com/lucasalfare/flbattle/Fighter.kt)**
 
-* **Purpose:** Represent a full character with attributes, rules, HP, and inventory.
-* **Practical use:**
+* **Purpose:** Represent a complete character with attributes, rules, HP, and inventory.
+* **Usage:**
 
-    * Centralizes logic for attacking, taking damage, and using items.
-    * Contains an inventory to store items affecting attributes, HP, or rules.
+    * Centralizes attack, damage reception, and item usage logic.
+    * Holds an inventory for items affecting attributes, HP, or rules.
     * Maintains state (HP, buffs/debuffs, active effects).
 * **Implementation flow:**
 
-    1. Create `Fighter` with `Attributes` and `Rules`.
-    2. Add items to `Inventory`.
-    3. Call `attack(target, validators)` during `Battle`.
-    4. Apply item effects and buffs before or after attack.
+    1. Create Fighter with Attributes and Rules.
+    2. Add items to Inventory.
+    3. Call `attack(target, validators)` during Battle.
+    4. Apply item and buff effects before or after attacks.
 * **Example:**
 
   ```kotlin
   val warrior = Fighter("Warrior", warriorAttributes, listOf(PhysicalAttackRule()))
   val potion = Item("Potion", "Restores 20 HP", listOf(HpRestoreEffect(20)))
   warrior.inventory.addItem(potion)
-  warrior.useItem(potion, warrior) // self-use
+  warrior.useItem(potion, warrior)
   ```
 
 ---
 
 ### 4. **[Battle](src/main/kotlin/com/lucasalfare/flbattle/Battle.kt)**
 
-* **Purpose:** Manage turn-based battles between Fighters.
-* **Practical use:**
+* **Purpose:** Implement a finite state machine (FSM) controlling turn-based combat between two Fighters.
+  Tracks combat state, exposes phases, and supports UI, testing, and external simulation integration.
 
-    * Alternates turns between attacker and defender.
-    * Applies attacks using `Rules` and validation via `Validators`.
-    * Can integrate item usage during the turn.
+* **Features:**
+
+    * Explicit phase cycle: `TURN_START`, `PRE_ITEM`, `ACTION`, `POST_ACTION`, `TURN_END`, `FINISHED`.
+    * Manual flow control — caller decides phase progression.
+    * Phase callbacks: `on(phase) { ... }`.
+    * Rule integration via Validators.
+    * Automatic combat end detection when a Fighter dies.
+
+* **Usage:**
+
+    * Alternates attacker/defender deterministically.
+    * Supports item use and attacks at specific phases.
+    * Provides a testable, simple API through `advancePhase()`.
+
 * **Implementation flow:**
 
-    1. Create `Battle` with two Fighters and a list of `Validators`.
-    2. Start turn loop until one Fighter is defeated.
-    3. During each turn, apply items, buffs, and attack.
+    1. Create `Battle(f1, f2, validators)`.
+    2. Register callbacks with `on(Phase.X) { battle -> /* reaction */ }`.
+    3. Call `begin()` to start combat.
+    4. Progress phases with `advancePhase()`.
+    5. Use items in `Phase.PRE_ITEM` and attacks in `Phase.ACTION`.
+    6. Repeat until `Phase.FINISHED` or `finishNow()`.
+
 * **Example:**
 
   ```kotlin
   val battle = Battle(warrior, mage, validators)
-  battle.start()
+
+  battle.on(Battle.Phase.TURN_START) {
+    println("Turn of ${it.currentAttacker.name}")
+  }
+
+  battle.on(Battle.Phase.FINISHED) {
+    println("Winner: ${it.winner()?.name ?: "(none)"}")
+  }
+
+  battle.begin()
+
+  while (!battle.isFinished()) {
+    when (battle.phase) {
+      Battle.Phase.PRE_ITEM -> battle.advancePhase()
+      Battle.Phase.ACTION -> {
+        battle.attack()
+        if (!battle.isFinished()) battle.advancePhase()
+      }
+      else -> battle.advancePhase()
+    }
+  }
   ```
 
 ---
 
 ### 5. **[Validator](src/main/kotlin/com/lucasalfare/flbattle/Validators.kt)**
 
-* **Purpose:** Ensure actions follow game rules and that complex interactions of buffs, debuffs, or items are consistent.
-* **Practical use:**
+* **Purpose:** Ensure actions respect game rules and maintain consistency in complex interactions.
+* **Usage:**
 
     * Prevent invalid attacks (e.g., invulnerable target)
-    * Avoid conflicts between buffs or item effects
+    * Avoid buff/item effect conflicts
     * Check conditions before applying temporary effects
 * **Implementation flow:**
 
-    1. Create class implementing `Validator`.
-    2. Implement `validate(attacker, defender, damage)` or equivalent methods.
-    3. Add to `Battle`’s validator list.
+    1. Implement `Validator` interface.
+    2. Implement `validate(attacker, defender, damage)` or similar methods.
+    3. Add to Battle validators list.
 * **Example:**
 
   ```kotlin
@@ -158,16 +193,16 @@ Below are details of each component implemented in code, with **practical usage 
 
 ### 6. **[Effect](src/main/kotlin/com/lucasalfare/flbattle/Effects.kt)**
 
-* **Purpose:** Encapsulate logic for any effect applied to a Fighter in a modular, reusable way.
-* **Practical use:**
+* **Purpose:** Encapsulate any effect applied to a Fighter, modular and reusable.
+* **Usage:**
 
-    * Effects from items, skills, buffs, and debuffs
-    * Can modify attributes, add rules, or interact with `Validators`
+    * Item, ability, buff, or debuff effects.
+    * Can modify attributes, add rules, or interact with Validators.
 * **Implementation flow:**
 
-    1. Create class implementing `Effect`.
-    2. Implement `apply(target: Fighter)` to modify the target’s state.
-    3. Associate effects with items or skills.
+    1. Implement `Effect` interface.
+    2. Define `apply(target: Fighter)` to modify target state.
+    3. Assign effects to items or abilities.
 * **Example:**
 
   ```kotlin
@@ -182,17 +217,17 @@ Below are details of each component implemented in code, with **practical usage 
 
 ### 7. **[Item](src/main/kotlin/com/lucasalfare/flbattle/Items.kt)**
 
-* **Purpose:** Represent objects that can modify a Fighter's attributes or states.
-* **Practical use:**
+* **Purpose:** Represent objects that can modify Fighter attributes or states.
+* **Usage:**
 
-    * Contains name, description, and list of `Effects`
-    * Can be used on self or another Fighter
-    * Supports consumables, equipment, or strategic items
+    * Includes name, description, and list of Effects.
+    * Can target self or another Fighter.
+    * Supports consumables, equipment, and strategic items.
 * **Implementation flow:**
 
     1. Create item with desired effects.
-    2. Add to Fighter’s inventory.
-    3. Call `useItem(item, target)` during turn.
+    2. Add to Fighter inventory.
+    3. Use item with `useItem(item, target)` during turn.
 * **Example:**
 
   ```kotlin
@@ -205,14 +240,14 @@ Below are details of each component implemented in code, with **practical usage 
 
 ### 8. **[Inventory](src/main/kotlin/com/lucasalfare/flbattle/Inventory.kt)**
 
-* **Purpose:** Organize and manage a Fighter’s items in a centralized way.
-* **Practical use:**
+* **Purpose:** Organize and manage a Fighter's items centrally.
+* **Usage:**
 
-    * Allows adding, removing, and listing items
-    * Facilitates strategic item usage during battle
+    * Add, remove, and list items.
+    * Enable strategic item use during combat.
 * **Implementation flow:**
 
-    1. Create `Inventory` inside `Fighter`.
+    1. Create Inventory in Fighter.
     2. Add items to inventory.
     3. List or use items as needed per turn.
 * **Example:**
@@ -225,38 +260,12 @@ Below are details of each component implemented in code, with **practical usage 
 
 ---
 
-## Combat Flow Suggestion
+## Combat Flow Example
 
 1. Turn starts → active Fighter decides action
 2. Apply passive or active items (`Effect.apply()`)
-3. Attack calculated via `Rule` (`calculate`)
-4. Validators applied for consistency check
-5. Damage or effect applied (`Fighter.receiveDamage()` or `Effect`)
+3. Calculate attack via Rule (`calculate`)
+4. Apply Validators for consistency
+5. Apply damage or effect (`Fighter.receiveDamage()` or `Effect`)
 6. Turn ends → next Fighter
 7. Repeat until a winner is determined
-
-# [LICENSE](LICENSE)
-
-```
-MIT License
-
-Copyright (c) 2025 Francisco Lucas
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-```
