@@ -1,9 +1,14 @@
+/**
+ * Not to many dependencies, version catalog is not needed for now.
+ */
 plugins {
   kotlin("jvm") version "2.2.0"
+  application
+  `maven-publish`
 }
 
 group = "com.lucasalfare"
-version = "1.0-SNAPSHOT"
+version = "1.0-alpha-1"
 
 repositories {
   mavenCentral()
@@ -18,6 +23,18 @@ dependencies {
 tasks.test {
   useJUnitPlatform()
 }
+
 kotlin {
   jvmToolchain(21)
+}
+
+/**
+ * Helper block to configure Maven Publishing.
+ */
+publishing {
+  publications {
+    create<MavenPublication>("Maven") {
+      from(components["kotlin"])
+    }
+  }
 }
