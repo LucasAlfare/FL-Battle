@@ -163,7 +163,10 @@ class Battle(
    * @param target alvo do item; padrão é o próprio atacante.
    */
   fun useItem(item: Item, target: Fighter = attacker) {
-    require(phase == Phase.PRE_ITEM) { "useItem() só é permitido em Phase.PRE_ITEM" }
+    if (phase != Phase.PRE_ITEM) {
+      throw IllegalStateException("useItem() só é permitido em Phase.PRE_ITEM")
+    }
+
     attacker.useItem(item, target)
     checkAndFinishIfNeeded()
   }
@@ -183,7 +186,9 @@ class Battle(
    * @throws IllegalStateException se chamado fora de [Phase.ACTION].
    */
   fun attack() {
-    require(phase == Phase.ACTION) { "attack() só é permitido em Phase.ACTION" }
+    if (phase != Phase.ACTION) {
+      throw IllegalStateException("attack() só é permitido em Phase.ACTION")
+    }
 
     attacker.attack(defender, validators)
 

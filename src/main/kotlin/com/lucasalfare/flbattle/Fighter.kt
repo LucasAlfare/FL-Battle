@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory
  * - Receber dano
  * - Gerenciar inventário e uso de itens
  */
-class Fighter(
+data class Fighter(
   val name: String,
   val attributes: Attributes,
   val rules: List<Rule>
