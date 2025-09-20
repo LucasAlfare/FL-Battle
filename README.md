@@ -1,6 +1,7 @@
 > Read in english [here](README.english.md)
 
-# FL-Battle: Engine modular de combate para jogos (protótipo Kotlin)
+# FL-Battle: Engine modular de Combate para Jogos
+[![](https://jitpack.io/v/LucasAlfare/FL-Battle.svg)](https://jitpack.io/#LucasAlfare/FL-Battle)
 
 ## Resumo
 
@@ -20,15 +21,22 @@ Em boa parte da elaboração utilizei _LLMs_ para completarem código para mim, 
 
 ---
 
-## Mais sobre a motivação
+## Como experimentar
 
-* Criar um sistema flexível de combate que não dependa de valores hardcoded.
-* Permitir criação de personagens únicos e variados, com atributos e habilidades próprias.
-* Garantir modularidade para itens, buffs e debuffs.
-* Implementar uma camada de validação que permita interações complexas e previna inconsistências.
-* Servir como base para expansão futura: PvP, PvE, combates em grupo, habilidades especiais e itens estratégicos.
+Estou disponibilizando esse projeto através do [Jitpack](https://jitpack.io/#LucasAlfare/FL-Battle/Tag):
 
----
+```kotlin
+// in your build.gradle.kts
+repositories {
+  maven("http://jitpack.io")
+}
+
+dependencies {
+  implementation("com.github.LucasAlfare:FL-Battle:1.0-alpha-1")
+}
+```
+
+Caso esteja utilizando Maven outro sistema de build, acesse o link acima do Jitpack para mais detalhes de como incluir esse projeto sem precisar baixa-lo.
 
 ## Componentes do Protótipo
 

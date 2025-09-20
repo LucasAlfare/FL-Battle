@@ -1,4 +1,5 @@
-# FL-Battle: Modular Combat Engine for Games (Kotlin Prototype)
+# FL-Battle: Modular Combat Engine for Games
+[![](https://jitpack.io/v/LucasAlfare/FL-Battle.svg)](https://jitpack.io/#LucasAlfare/FL-Battle)
 
 ## Overview
 
@@ -18,13 +19,22 @@ LLMs were partially used to generate code snippets, so the project remains a raw
 
 ---
 
-## Motivation
+## How to experiment
 
-* Build a flexible combat system without hardcoded values.
-* Support creation of unique characters with custom attributes and abilities.
-* Ensure modularity for items, buffs, and debuffs.
-* Implement validation layers to handle complex interactions and prevent inconsistencies.
-* Serve as a foundation for future expansions: PvP, PvE, group battles, special abilities, and strategic items.
+I am releasing this project through [Jitpack](https://jitpack.io/#LucasAlfare/FL-Battle/Tag):
+
+```kotlin
+// in your build.gradle.kts
+repositories {
+  maven("http://jitpack.io")
+}
+
+dependencies {
+  implementation("com.github.LucasAlfare:FL-Battle:1.0-alpha-1")
+}
+```
+
+In case you are using Maven or other build system, enter the Jitpack link above to see more details on how to get this project without downloading it directly. 
 
 ---
 
