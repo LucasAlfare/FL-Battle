@@ -16,21 +16,3 @@ interface Rule {
    */
   fun calculate(attacker: Fighter, defender: Fighter): Int
 }
-
-/** Regra de ataque físico simples: dano = strength - defesa */
-class PhysicalAttackRule : Rule {
-  override fun calculate(attacker: Fighter, defender: Fighter): Int {
-    val raw = attacker.attributes.get("strength")
-    val reduced = raw - defender.attributes.get("defense")
-    return reduced.coerceAtLeast(1)
-  }
-}
-
-/** Regra de ataque mágico simples: dano = intelligence - magic_resist */
-class MagicAttackRule : Rule {
-  override fun calculate(attacker: Fighter, defender: Fighter): Int {
-    val raw = attacker.attributes.get("intelligence")
-    val reduced = raw - defender.attributes.get("magic_resist")
-    return reduced.coerceAtLeast(1)
-  }
-}
