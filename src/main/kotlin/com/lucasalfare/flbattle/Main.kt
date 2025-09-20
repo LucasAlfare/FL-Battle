@@ -61,30 +61,3 @@
  */
 package com.lucasalfare.flbattle
 
-fun main() {
-  // Atributos dos personagens
-  val warriorAttributes = Attributes(mutableMapOf("hp" to 100, "strength" to 15, "defense" to 10))
-  val mageAttributes = Attributes(mutableMapOf("hp" to 50, "intelligence" to 20, "magic_resist" to 5))
-
-  // Criando Fighters
-  val warrior = Fighter("Warrior", warriorAttributes, listOf(PhysicalAttackRule()))
-  val mage = Fighter("Mage", mageAttributes, listOf(MagicAttackRule()))
-
-  // Criando itens
-  val potion = Item("Potion", "Recupera 20 HP", listOf(HpRestoreEffect(20)))
-  val sword =
-    Item("Sword of Strength", "Aumenta força em 5 permanentemente", listOf(AttributeBoostEffect("strength", 5)))
-  val shield = Item("Shield of Invulnerability", "Invulnerável por 1 turno", listOf(InvulnerabilityEffect(1)))
-
-  // Adicionando itens ao inventário
-  warrior.inventory.addItem(potion)
-  warrior.inventory.addItem(sword)
-  warrior.inventory.addItem(shield)
-
-  // Lista de validadores
-  val validators = listOf(HPValidator(), BuffConflictValidator(), InvulnerabilityValidator(), ItemEffectValidator())
-
-  // Inicia combate
-  val battle = Battle(warrior, mage, validators)
-  battle.start()
-}

@@ -103,20 +103,57 @@ A seguir, veja os detalhes de cada componente que coloquei em código, com **exe
 
 ### 4. **[Battle](src/main/kotlin/com/lucasalfare/flbattle/Battle.kt)**
 
-* **Propósito:** Controlar combates turn-based entre Fighters.
-* **Uso prático:**
-    * Alterna turnos entre atacante e defensor.
-    * Aplica ataques usando Rules e validações via Validators.
-    * Pode integrar o uso de itens durante o turno.
-* **Fluxo de implementação:**
-    1. Criar Battle com dois Fighters e uma lista de Validators.
-    2. Iniciar loop de turns até que um Fighter não esteja mais vivo.
-    3. Durante cada turno, aplicar itens, buffs e atacar.
-* **Exemplo prático:**
-  ```kotlin
-  val battle = Battle(warrior, mage, validators)
-  battle.start()
-  ```
+**Propósito:** Implementar uma máquina de estados finita (FSM) que controla um combate por turnos
+entre dois `Fighter`s. A classe mantém o estado do combate, expõe fases nominais
+e permite integração com UIs, testes e simulações externas.
+
+**Características principais:**
+* Ciclo de fases explícitas: `TURN_START`, `PRE_ITEM`, `ACTION`, `POST_ACTION`, `TURN_END`, `FINISHED`.
+* Controle externo do fluxo: nenhuma iteração automática — chamador decide quando avançar.
+* Callbacks por fase: `on(phase) { ... }` para reagir à entrada em fases.
+* Integração de regras via `Validator`s fornecidos no construtor.
+* Reconhecimento automático de fim de combate quando um `Fighter` morre.
+
+**Uso prático:**
+* Alterna turnos entre atacante/defensor de forma explícita e determinística.
+* Permite uso de itens e execução de ataques em fases específicas.
+* Mantém API simples e testável — todas as transições passam por `advancePhase()`.
+
+
+**Fluxo de implementação:**
+1. Criar `Battle(f1, f2, validators)`.
+2. Registrar callbacks com `on(Phase.X) { battle -> /* reação */ }` se necessário.
+3. Chamar `begin()` para inicializar o combate.
+4. Avançar fases manualmente com `advancePhase()`.
+5. Durante `Phase.PRE_ITEM` usar `useItem()`; durante `Phase.ACTION` usar `attack()`.
+6. Repetir chamadas a `advancePhase()` até `Phase.FINISHED` ou chamar `finishNow()`.
+
+**Exemplo prático (padrão de uso):**
+
+```kotlin
+val battle = Battle(warrior, mage, validators)
+
+battle.on(Battle.Phase.TURN_START) {
+  println("Turno de ${it.currentAttacker.name}")
+}
+
+battle.on(Battle.Phase.FINISHED) {
+  println("Vencedor: ${it.winner()?.name ?: "(nenhum)"}")
+}
+
+battle.begin()
+
+while (!battle.isFinished()) {
+  when (battle.phase) {
+    Battle.Phase.PRE_ITEM -> battle.advancePhase()
+    Battle.Phase.ACTION -> {
+      battle.attack()
+      if (!battle.isFinished()) battle.advancePhase()
+    }
+    else -> battle.advancePhase()
+  }
+}
+```
 
 ---
 
