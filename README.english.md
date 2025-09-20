@@ -67,7 +67,7 @@ Below are the core components with **usage examples and implementation flow**.
 
 ---
 
-### 2. **[Rule](src/main/kotlin/com/lucasalfare/flbattle/Rules.kt)**
+### 2. **[Rule](src/main/kotlin/com/lucasalfare/flbattle/Rule.kt)**
 
 * **Purpose:** Modularize damage and ability logic.
 * **Usage:**
@@ -175,7 +175,7 @@ Below are the core components with **usage examples and implementation flow**.
 
 ---
 
-### 5. **[Validator](src/main/kotlin/com/lucasalfare/flbattle/Validators.kt)**
+### 5. **[Validator](src/main/kotlin/com/lucasalfare/flbattle/Validator.kt)**
 
 * **Purpose:** Ensure actions respect game rules and maintain consistency in complex interactions.
 * **Usage:**
@@ -201,7 +201,7 @@ Below are the core components with **usage examples and implementation flow**.
 
 ---
 
-### 6. **[Effect](src/main/kotlin/com/lucasalfare/flbattle/Effects.kt)**
+### 6. **[Effect](src/main/kotlin/com/lucasalfare/flbattle/Effect.kt)**
 
 * **Purpose:** Encapsulate any effect applied to a Fighter, modular and reusable.
 * **Usage:**
@@ -225,7 +225,7 @@ Below are the core components with **usage examples and implementation flow**.
 
 ---
 
-### 7. **[Item](src/main/kotlin/com/lucasalfare/flbattle/Items.kt)**
+### 7. **[Item](src/main/kotlin/com/lucasalfare/flbattle/Item.kt)**
 
 * **Purpose:** Represent objects that can modify Fighter attributes or states.
 * **Usage:**

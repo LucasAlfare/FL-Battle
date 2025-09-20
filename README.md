@@ -64,7 +64,7 @@ A seguir, veja os detalhes de cada componente que coloquei em código, com **exe
 
 ---
 
-### 2. **[Rule](src/main/kotlin/com/lucasalfare/flbattle/Rules.kt)**
+### 2. **[Rule](src/main/kotlin/com/lucasalfare/flbattle/Rule.kt)**
 
 * **Propósito:** Modularizar a lógica de cálculo de dano e habilidades.
 * **Uso prático:**
@@ -165,7 +165,7 @@ while (!battle.isFinished()) {
 
 ---
 
-### 5. **[Validator](src/main/kotlin/com/lucasalfare/flbattle/Validators.kt)**
+### 5. **[Validator](src/main/kotlin/com/lucasalfare/flbattle/Validator.kt)**
 * **Propósito:** Garantir que ações respeitem regras do jogo e que interações complexas de buffs, debuffs ou itens sejam consistentes.
 * **Uso prático:**
     * Evitar ataques inválidos (ex.: alvo invulnerável)
@@ -187,7 +187,7 @@ while (!battle.isFinished()) {
 
 ---
 
-### 6. **[Effect](src/main/kotlin/com/lucasalfare/flbattle/Effects.kt)**
+### 6. **[Effect](src/main/kotlin/com/lucasalfare/flbattle/Effect.kt)**
 
 * **Propósito:** Encapsular lógica de qualquer efeito aplicado a um Fighter, de forma modular e reutilizável.
 * **Uso prático:**
@@ -208,7 +208,7 @@ while (!battle.isFinished()) {
 
 ---
 
-### 7. **[Item](src/main/kotlin/com/lucasalfare/flbattle/Items.kt)**
+### 7. **[Item](src/main/kotlin/com/lucasalfare/flbattle/Item.kt)**
 * **Propósito:** Representar objetos que podem alterar atributos ou estados de um Fighter.
 * **Uso prático:**
     * Contém nome, descrição e lista de Effects
