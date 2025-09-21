@@ -24,22 +24,21 @@ data class Fighter(
 
   private val logger: Logger = LoggerFactory.getLogger(Fighter::class.java)
 
-  /** HP atual do personagem */
-  var hp = attributes.get("hp")
-
   /** Inventário do personagem */
   val inventory = Inventory()
 
   /**
    * Realiza ataque a um alvo, aplicando todas as regras e validadores.
    *
+   * TODO: Múltiplas "regras" são aplicadas em sequência, talvez seja interessante pensar nessa aplicação de outra forma?
+   *
    * @param target Fighter que receberá o ataque
    * @param validators Lista de validadores ativos neste combate
    */
   fun attack(target: Fighter, validators: List<Validator>) {
     rules.forEach { rule ->
-      val damage = rule.calculate(this, target)
-      applyDamageWithValidation(this, target, damage, validators)
+      val rawDamage = rule.calculate(attacker = this, defender = target)
+      applyDamageWithValidation(attacker = this, defender = target, damage = rawDamage, validators = validators)
     }
   }
 
@@ -50,8 +49,8 @@ data class Fighter(
    * @param attacker Fighter que causou o dano
    */
   fun receiveDamage(amount: Int, attacker: Fighter) {
-    hp -= amount
-    logger.info("$name took $amount damage from ${attacker.name} (HP: $hp)")
+    setHp(amount = getHp() - amount)
+    logger.info("$name got $amount damage from ${attacker.name} (HP: ${getHp()})")
   }
 
   /**
@@ -68,15 +67,15 @@ data class Fighter(
     damage: Int,
     validators: List<Validator>
   ) {
-    if (validators.all { it.validate(attacker, defender, damage) }) {
-      defender.receiveDamage(damage, attacker)
+    if (validators.all { it.validate(attacker = attacker, defender = defender, rawDamage = damage) }) {
+      defender.receiveDamage(amount = damage, attacker = attacker)
     } else {
       logger.warn("Ação bloqueada por validação (ataque de ${attacker.name} a ${defender.name})")
     }
   }
 
   /** Retorna true se o personagem ainda estiver vivo */
-  fun isAlive() = hp > 0
+  fun isAlive() = getHp() > 0
 
   /**
    * Usa um item do inventário em si mesmo ou em outro Fighter.
@@ -90,5 +89,10 @@ data class Fighter(
       return
     }
     item.use(target)
+  }
+
+  fun getHp(): Int = attributes.get("hp")
+  fun setHp(amount: Int) {
+    attributes.set("hp", amount)
   }
 }

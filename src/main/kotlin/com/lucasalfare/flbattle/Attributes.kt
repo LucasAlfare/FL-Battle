@@ -8,7 +8,7 @@ package com.lucasalfare.flbattle
  *
  * Exemplo de atributos: "hp", "strength", "defense", "intelligence", "magic_resist".
  */
-class Attributes(private val values: MutableMap<String, Int> = mutableMapOf()) {
+data class Attributes(private val values: MutableMap<String, Int> = mutableMapOf()) {
 
   /** Retorna o valor atual de um atributo, 0 se não existir. */
   fun get(name: String): Int = values[name] ?: 0

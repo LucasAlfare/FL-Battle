@@ -14,10 +14,6 @@ class BattleTest {
     override fun calculate(attacker: Fighter, defender: Fighter) = damage
   }
 
-  private class AlwaysValidator(private val allow: Boolean) : Validator {
-    override fun validate(attacker: Fighter, defender: Fighter, damage: Int) = allow
-  }
-
   @Test
   fun `begin starts at TURN_START if both alive`() {
     val b = Battle(fighter("A", 100), fighter("B", 100))
@@ -121,7 +117,7 @@ class BattleTest {
     b.begin()
     b.advancePhase() // PRE_ITEM
     b.useItem(heal, f1)
-    assertEquals(70, f1.hp)
+    assertEquals(70, f1.getHp())
   }
 
   @Test
@@ -160,7 +156,7 @@ class BattleTest {
     b.advancePhase() // PRE_ITEM
     b.advancePhase() // ACTION
     b.attack()
-    assertEquals(70, f2.hp)
+    assertEquals(70, f2.getHp())
     assertFalse(b.isFinished())
   }
 

@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory
  * - Nome e descrição
  * - Lista de efeitos que serão aplicados ao usar o item
  */
-class Item(
+data class Item(
   val name: String,
   val description: String,
   val effects: List<Effect>

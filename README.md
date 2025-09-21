@@ -38,6 +38,129 @@ dependencies {
 
 Caso esteja utilizando Maven outro sistema de build, acesse o link acima do Jitpack para mais detalhes de como incluir esse projeto sem precisar baixa-lo.
 
+---
+
+## Exemplo rápido
+
+A seguir é um exemplo absolutamente simplista de como podemos lidar com combate usando FL-Battle. No exemplo temos valores absurdamente _hardcoded_, porém a intenção é demonstrar o funcionamento e aspectos gerais da usabilidade da lib. Confira:
+
+```kotlin
+fun main() {
+  // we just set up our validator in list
+  val myValidators = listOf(BasicAttackValidator)
+
+  // here we set up our battle
+  val battle = Battle(
+    fighterA = Hero.fighter,
+    fighterB = Rat.fighter,
+    validators = myValidators
+  )
+
+  // we can also set up callbacks to happen on each Phase
+  // obviously you can make a fine-grained control to the battle with this
+  Battle.Phase.entries.forEach { it ->
+    battle.on(it) { battle ->
+      println("Great, we are in the ${battle.phase} Phase!")
+
+      // for example, directly from here I can call
+      // the attack(), for the current Battle cycle:
+      if (battle.phase == Phase.ACTION) {
+        battle.attack()
+      }
+
+      battle.advancePhase()
+    }
+  }
+
+  // we call this to ensure fighters are correctly ordered
+  battle.begin()
+
+  // we can not to attack yet, attack is allowed only in Phase.ACTION state
+  // you can check the battle flow in the Battle file source
+  // battle.attack()
+}
+
+// This is what will say how exactly the damage will be calculated.
+// We can have multiple rules. Normally for complex interactions, the
+// rules must take other states in point. Syntax here was a raw
+// object, but you can model as you want.
+// The calculation result will be done when we call attack(), from
+// battle class, or attack(target: Fighter, validators: List<Validator>),
+// from the Fighter class.
+// The result of this will be the "raw damage" value.
+// For multiple rules, currently each is calculated, one after another,
+// and the damaged is sequentially applied.
+// Normally multiple rules can break each other, this is usually called
+// "special interaction". For most control, you have to implement
+// rigorous Validators (see below).
+object BasicAttackRule : Rule {
+  override fun calculate(attacker: Fighter, defender: Fighter): Int {
+    val attackerAttackAmount = attacker.attributes.get("attack")
+    val defenderDefenseAmount = defender.attributes.get("defense")
+    return max(0, attackerAttackAmount - defenderDefenseAmount)
+  }
+}
+
+// This is a code piece used to validate something.
+// This code is checked always the raw damage is calculated.
+// In the future I'll consider include a reference for the current
+// combat rules (or for the combat itself), in order to supply more
+// context when validating a thing.
+object BasicAttackValidator : Validator {
+  override fun validate(attacker: Fighter, defender: Fighter, rawDamage: Int): Boolean {
+    val nextHp = (defender.getHp() - rawDamage)
+    return (rawDamage >= 0) && (nextHp >= 0)
+  }
+}
+
+// I tried to encapsulate things in a raw object. You can do as you want.
+object Hero {
+  val attributes = Attributes(
+    mutableMapOf(
+      "attack" to 10,
+      "defense" to 10,
+      "hp" to 10
+    )
+  )
+
+  val fighter = Fighter(
+    name = "Gertjaars",
+    attributes = attributes,
+    rules = listOf(BasicAttackRule)
+  )
+}
+
+object Rat {
+  val attributes = Attributes(
+    mutableMapOf(
+      "attack" to 12,
+      "defense" to 7,
+      "hp" to 8
+    )
+  )
+
+  val fighter = Fighter(
+    name = "Rat",
+    attributes = attributes,
+    rules = listOf(BasicAttackRule)
+  )
+}
+
+// auxiliary
+fun println(data: Any) {
+  experiments.Logger.logger.debug(data.toString())
+}
+
+// auxiliary
+object Logger {
+  val logger: Logger = LoggerFactory.getLogger(experiments.Logger::class.java)
+}
+```
+
+Como você pôde ver, a ideia é justamente construir os elementos a partir das menores unidades possíveis, assim podemos ter controle e modularidade totais para construirmos combate em jogos. Devido a isso, também, podemos criar algum sistema de abstração para personagens. Poderemos abstrair todos os valores de atributos e cálculos para arquivos de dados, como JSON. 
+
+---
+
 ## Componentes do Protótipo
 
 A seguir, veja os detalhes de cada componente que coloquei em código, com **exemplos de uso prático e fluxo de implementação**.

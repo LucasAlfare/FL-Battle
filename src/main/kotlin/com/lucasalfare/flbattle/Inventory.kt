@@ -33,4 +33,6 @@ class Inventory {
 
   /** Retorna a lista de itens para uso em combate ou fora dele */
   fun getItems(): List<Item> = items
+
+  override fun toString(): String = items.toString()
 }

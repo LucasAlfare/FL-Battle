@@ -27,15 +27,15 @@ package com.lucasalfare.flbattle
  * **Thread-safety**: esta implementação **não é** thread-safe. Se for necessário o
  * acesso concorrente, proteja chamadas externas com sincronização adequada.
  *
- * @param f1 primeiro combatente; mantido como referência de origem.
- * @param f2 segundo combatente; mantido como referência de origem.
+ * @param fighterA primeiro combatente; mantido como referência de origem.
+ * @param fighterB segundo combatente; mantido como referência de origem.
  * @param validators lista de validadores a serem aplicados a cada ataque; pode ser vazia.
  *
  * @see Phase para as fases disponíveis.
  */
-class Battle(
-  private val f1: Fighter,
-  private val f2: Fighter,
+data class Battle(
+  private val fighterA: Fighter,
+  private val fighterB: Fighter,
   private val validators: List<Validator> = emptyList()
 ) {
   /**
@@ -51,10 +51,10 @@ class Battle(
   enum class Phase { TURN_START, PRE_ITEM, ACTION, POST_ACTION, TURN_END, FINISHED }
 
   /** Atacante atual (mutável internamente apenas). */
-  private var attacker: Fighter = f1
+  private var attacker: Fighter = fighterA
 
   /** Defensor atual (mutável internamente apenas). */
-  private var defender: Fighter = f2
+  private var defender: Fighter = fighterB
 
   /** Fase corrente. Modificada apenas por transições controladas. */
   var phase: Phase = Phase.TURN_START
@@ -91,7 +91,7 @@ class Battle(
   /* ---------- Inicialização / ciclo de vida ---------- */
 
   /**
-   * Inicializa a batalha: garante que `attacker` e `defender` apontem para [f1] e [f2]
+   * Inicializa a batalha: garante que `attacker` e `defender` apontem para [fighterA] e [fighterB]
    * e dispara o callback da fase inicial. Se um dos fighters já estiver morto
    * ao iniciar, a batalha entra diretamente em [Phase.FINISHED].
    *
@@ -100,9 +100,9 @@ class Battle(
    *  - dispara callbacks associados à fase final estabelecida.
    */
   fun begin() {
-    attacker = f1
-    defender = f2
-    val startPhase = if (f1.isAlive() && f2.isAlive()) Phase.TURN_START else Phase.FINISHED
+    attacker = fighterA
+    defender = fighterB
+    val startPhase = if (fighterA.isAlive() && fighterB.isAlive()) Phase.TURN_START else Phase.FINISHED
     nextPhase(startPhase)
   }
 
@@ -111,12 +111,12 @@ class Battle(
    * resultante.
    *
    * Regras de transição (resumidas):
-   *  - TURN_START -> PRE_ITEM
-   *  - PRE_ITEM -> ACTION
-   *  - ACTION -> POST_ACTION
-   *  - POST_ACTION -> TURN_END
-   *  - TURN_END -> (se defensor vivo: swap + TURN_START) ou FINISHED
-   *  - FINISHED -> FINISHED (noop)
+   *  - TURN_START → PRE_ITEM
+   *  - PRE_ITEM → ACTION
+   *  - ACTION → POST_ACTION
+   *  - POST_ACTION → TURN_END
+   *  - TURN_END → (se defensor vivo: swap + TURN_START) ou FINISHED
+   *  - FINISHED → FINISHED (noop)
    *
    * @return a [Phase] após a transição (pode ser igual à atual se FINISHED).
    */
@@ -205,8 +205,8 @@ class Battle(
    * @return instância de [Fighter] vencedora ou `null` em empate/indefinido.
    */
   fun winner(): Fighter? = when {
-    f1.isAlive() && !f2.isAlive() -> f1
-    f2.isAlive() && !f1.isAlive() -> f2
+    fighterA.isAlive() && !fighterB.isAlive() -> fighterA
+    fighterB.isAlive() && !fighterA.isAlive() -> fighterB
     else -> null
   }
 
@@ -233,7 +233,7 @@ class Battle(
    * sem necessariamente ocorrer durante a fase de ataque.
    */
   private fun checkAndFinishIfNeeded() {
-    if (!f1.isAlive() || !f2.isAlive()) {
+    if (!fighterA.isAlive() || !fighterB.isAlive()) {
       if (phase != Phase.FINISHED) nextPhase(Phase.FINISHED)
     }
   }

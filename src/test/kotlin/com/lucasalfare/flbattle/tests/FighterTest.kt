@@ -11,14 +11,14 @@ class FighterTest {
   }
 
   private class AlwaysValidator(private val allow: Boolean) : Validator {
-    override fun validate(attacker: Fighter, defender: Fighter, damage: Int) = allow
+    override fun validate(attacker: Fighter, defender: Fighter, rawDamage: Int) = allow
   }
 
   @Test
   fun `initial hp comes from attributes`() {
     val attrs = Attributes(mutableMapOf("hp" to 100))
     val fighter = Fighter("Hero", attrs, emptyList())
-    assertEquals(100, fighter.hp)
+    assertEquals(100, fighter.getHp())
   }
 
   @Test
@@ -49,7 +49,7 @@ class FighterTest {
     val enemy = Fighter("Enemy", Attributes(mutableMapOf("hp" to 50)), emptyList())
 
     hero.receiveDamage(20, enemy)
-    assertEquals(30, hero.hp)
+    assertEquals(30, hero.getHp())
   }
 
   @Test
@@ -57,7 +57,7 @@ class FighterTest {
     val attacker = Fighter("Hero", Attributes(mutableMapOf("hp" to 100)), listOf(FixedRule(25)))
     val defender = Fighter("Enemy", Attributes(mutableMapOf("hp" to 80)), emptyList())
     attacker.attack(defender, listOf(AlwaysValidator(true)))
-    assertEquals(55, defender.hp)
+    assertEquals(55, defender.getHp())
   }
 
   @Test
@@ -65,7 +65,7 @@ class FighterTest {
     val attacker = Fighter("Hero", Attributes(mutableMapOf("hp" to 100)), listOf(FixedRule(25)))
     val defender = Fighter("Enemy", Attributes(mutableMapOf("hp" to 80)), emptyList())
     attacker.attack(defender, listOf(AlwaysValidator(false)))
-    assertEquals(80, defender.hp)
+    assertEquals(80, defender.getHp())
   }
 
   @Test
@@ -73,7 +73,7 @@ class FighterTest {
     val attacker = Fighter("Hero", Attributes(mutableMapOf("hp" to 100)), listOf(FixedRule(10), FixedRule(15)))
     val defender = Fighter("Enemy", Attributes(mutableMapOf("hp" to 50)), emptyList())
     attacker.attack(defender, listOf(AlwaysValidator(true)))
-    assertEquals(25, defender.hp)
+    assertEquals(25, defender.getHp())
   }
 
   @Test
@@ -86,7 +86,7 @@ class FighterTest {
       }
     }))
     fighter.useItem(item, target)
-    assertEquals(100, target.hp) // no effect applied
+    assertEquals(100, target.getHp()) // no effect applied
   }
 
   @Test
@@ -101,6 +101,6 @@ class FighterTest {
     fighter.inventory.addItem(heal)
 
     fighter.useItem(heal, target)
-    assertEquals(70, target.hp)
+    assertEquals(70, target.getHp())
   }
 }

@@ -12,8 +12,8 @@ interface Validator {
    *
    * @param attacker Fighter que realiza a ação
    * @param defender Fighter que recebe a ação
-   * @param damage Valor de dano calculado antes da validação
+   * @param rawDamage Valor de dano calculado antes da validação
    * @return true se a ação é válida, false se deve ser bloqueada
    */
-  fun validate(attacker: Fighter, defender: Fighter, damage: Int): Boolean
+  fun validate(attacker: Fighter, defender: Fighter, rawDamage: Int): Boolean
 }
